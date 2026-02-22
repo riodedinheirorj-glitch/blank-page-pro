@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Loader2, MapPin } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, MapPin, Loader2 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 
 type AuthMode = "login" | "signup" | "forgot";
@@ -18,69 +18,43 @@ const Auth = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/", { replace: true });
-      }
+      if (session) navigate("/", { replace: true });
       setCheckingSession(false);
     });
-
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/", { replace: true });
-      }
+      if (session) navigate("/", { replace: true });
       setCheckingSession(false);
     });
-
     return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleLogin = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast.error(error.message === "Invalid login credentials" ? "E-mail ou senha incorretos" : error.message);
-    }
+    if (error) toast.error(error.message === "Invalid login credentials" ? "E-mail ou senha incorretos" : error.message);
     setLoading(false);
   };
 
   const handleSignup = async () => {
-    if (password.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres");
-      return;
-    }
+    if (password.length < 6) { toast.error("A senha deve ter pelo menos 6 caracteres"); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
-      },
+      email, password,
+      options: { emailRedirectTo: window.location.origin, data: { full_name: fullName } },
     });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Verifique seu e-mail para confirmar o cadastro!");
-      setMode("login");
-    }
+    if (error) toast.error(error.message);
+    else { toast.success("Verifique seu e-mail para confirmar o cadastro!"); setMode("login"); }
     setLoading(false);
   };
 
   const handleForgot = async () => {
-    if (!email) {
-      toast.error("Digite seu e-mail");
-      return;
-    }
+    if (!email) { toast.error("Digite seu e-mail"); return; }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Link de redefinição enviado para seu e-mail!");
-      setMode("login");
-    }
+    if (error) toast.error(error.message);
+    else { toast.success("Link de redefinição enviado para seu e-mail!"); setMode("login"); }
     setLoading(false);
   };
 
@@ -93,51 +67,53 @@ const Auth = () => {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a1a]">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(180deg, #EAF2FF 0%, #FFFFFF 100%)" }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#2563EB" }} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0a0a1a 0%, #0d1b2a 40%, #1b2838 100%)" }}>
-      {/* Animated orbs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-20 animate-pulse" style={{ background: "radial-gradient(circle, #2F80ED 0%, transparent 70%)", filter: "blur(80px)" }} />
-      <div className="absolute bottom-[-15%] right-[-5%] w-[400px] h-[400px] rounded-full opacity-15 animate-pulse" style={{ background: "radial-gradient(circle, #7B61FF 0%, transparent 70%)", filter: "blur(80px)", animationDelay: "1s" }} />
-      <div className="absolute top-[50%] left-[60%] w-[250px] h-[250px] rounded-full opacity-10 animate-pulse" style={{ background: "radial-gradient(circle, #00D4AA 0%, transparent 70%)", filter: "blur(60px)", animationDelay: "2s" }} />
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "linear-gradient(180deg, #EAF2FF 0%, #FFFFFF 100%)" }}>
+      {/* Grid texture */}
+      <div className="fixed inset-0 pointer-events-none" style={{ opacity: 0.03, backgroundImage: "linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
 
-      {/* Grid pattern */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
-
-      <div className="relative z-10 w-full max-w-md px-6">
-        {/* Logo / Brand */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5" style={{ background: "linear-gradient(135deg, #2F80ED, #7B61FF)" }}>
-            <MapPin className="w-8 h-8 text-white" />
+      <div className="relative z-10 w-full" style={{ maxWidth: 420 }}>
+        {/* Card */}
+        <div className="bg-white p-8" style={{ borderRadius: 24, boxShadow: "0px 20px 40px rgba(37, 99, 235, 0.15)" }}>
+          {/* Logo + Title */}
+          <div className="flex items-center gap-3 justify-center mb-2">
+            <div className="flex items-center justify-center rounded-full" style={{ width: 48, height: 48, background: "#2563EB" }}>
+              <MapPin className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <span className="font-semibold text-xl" style={{ color: "#111827" }}>Rotasmart</span>
+              <span className="block text-sm" style={{ color: "#6B7280", fontWeight: 400 }}>Motorista</span>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
-            Rota<span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, #2F80ED, #7B61FF)" }}>Smart</span>
-          </h1>
-          <p className="text-gray-400 mt-2 text-sm">Otimize suas rotas com inteligência</p>
-        </div>
 
-        {/* Glass card */}
-        <div className="rounded-3xl p-8 backdrop-blur-xl border" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)", boxShadow: "0 32px 64px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
-          {/* Mode tabs */}
+          <p className="text-center mb-6 text-sm" style={{ color: "#6B7280" }}>
+            Acesse sua conta ou crie um novo cadastro para iniciar a navegação.
+          </p>
+
+          {/* Tabs */}
           {mode !== "forgot" && (
-            <div className="flex mb-8 rounded-xl p-1" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <div className="flex p-1 mb-6" style={{ background: "#F3F4F6", borderRadius: 999 }}>
               {(["login", "signup"] as const).map((m) => (
                 <button
                   key={m}
+                  type="button"
                   onClick={() => setMode(m)}
-                  className="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300"
+                  className="flex-1 py-2 text-sm font-semibold transition-all duration-200"
                   style={{
-                    background: mode === m ? "linear-gradient(135deg, #2F80ED, #7B61FF)" : "transparent",
-                    color: mode === m ? "#fff" : "rgba(255,255,255,0.5)",
-                    boxShadow: mode === m ? "0 4px 16px rgba(47,128,237,0.35)" : "none",
+                    borderRadius: 999,
+                    background: mode === m ? "#FFFFFF" : "transparent",
+                    color: mode === m ? "#2563EB" : "#6B7280",
+                    boxShadow: mode === m ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                    fontWeight: mode === m ? 600 : 400,
                   }}
                 >
-                  {m === "login" ? "Entrar" : "Criar conta"}
+                  {m === "login" ? "Entrar" : "Cadastrar"}
                 </button>
               ))}
             </div>
@@ -145,98 +121,118 @@ const Auth = () => {
 
           {mode === "forgot" && (
             <div className="mb-6">
-              <button onClick={() => setMode("login")} className="text-sm text-gray-400 hover:text-white transition-colors">
+              <button type="button" onClick={() => setMode("login")} className="text-sm transition-colors" style={{ color: "#2563EB" }}>
                 ← Voltar ao login
               </button>
-              <h2 className="text-xl font-semibold text-white mt-3">Redefinir senha</h2>
-              <p className="text-gray-400 text-sm mt-1">Enviaremos um link para seu e-mail</p>
+              <h2 className="text-lg font-semibold mt-2" style={{ color: "#111827" }}>Redefinir senha</h2>
+              <p className="text-sm" style={{ color: "#6B7280" }}>Enviaremos um link para seu e-mail</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
-              <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Nome completo"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm text-white placeholder-gray-500 outline-none transition-all duration-300 focus:ring-2"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  onFocus={(e) => { e.target.style.borderColor = "rgba(47,128,237,0.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(47,128,237,0.1)"; }}
-                  onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; e.target.style.boxShadow = "none"; }}
-                />
+              <div>
+                <label className="block mb-1.5" style={{ fontSize: 13, color: "#374151", fontWeight: 500 }}>Nome completo</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#9CA3AF" }} />
+                  <input
+                    type="text"
+                    placeholder="Seu nome"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    className="w-full pl-11 pr-4 text-sm outline-none transition-all duration-200"
+                    style={{ height: 48, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 14 }}
+                    onFocus={(e) => { e.target.style.borderColor = "#2563EB"; e.target.style.boxShadow = "0 0 0 3px rgba(37, 99, 235, 0.2)"; }}
+                    onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+                  />
+                </div>
               </div>
             )}
 
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
-              <input
-                type="email"
-                placeholder="E-mail"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm text-white placeholder-gray-500 outline-none transition-all duration-300"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-                onFocus={(e) => { e.target.style.borderColor = "rgba(47,128,237,0.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(47,128,237,0.1)"; }}
-                onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; e.target.style.boxShadow = "none"; }}
-              />
+            <div>
+              <label className="block mb-1.5" style={{ fontSize: 13, color: "#374151", fontWeight: 500 }}>E-mail</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#9CA3AF" }} />
+                <input
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full pl-11 pr-4 text-sm outline-none transition-all duration-200"
+                  style={{ height: 48, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 14 }}
+                  onFocus={(e) => { e.target.style.borderColor = "#2563EB"; e.target.style.boxShadow = "0 0 0 3px rgba(37, 99, 235, 0.2)"; }}
+                  onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+                />
+              </div>
             </div>
 
             {mode !== "forgot" && (
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="w-full pl-11 pr-12 py-3.5 rounded-xl text-sm text-white placeholder-gray-500 outline-none transition-all duration-300"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  onFocus={(e) => { e.target.style.borderColor = "rgba(47,128,237,0.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(47,128,237,0.1)"; }}
-                  onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; e.target.style.boxShadow = "none"; }}
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            )}
-
-            {mode === "login" && (
-              <div className="text-right">
-                <button type="button" onClick={() => setMode("forgot")} className="text-xs text-gray-400 hover:text-blue-400 transition-colors">
-                  Esqueceu a senha?
-                </button>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label style={{ fontSize: 13, color: "#374151", fontWeight: 500 }}>Senha</label>
+                  {mode === "login" && (
+                    <button
+                      type="button"
+                      onClick={() => setMode("forgot")}
+                      className="transition-all duration-200 hover:underline"
+                      style={{ fontSize: 13, color: "#2563EB", textDecoration: "none" }}
+                    >
+                      Esqueceu sua senha?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#9CA3AF" }} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="w-full pl-11 pr-12 text-sm outline-none transition-all duration-200"
+                    style={{ height: 48, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 14 }}
+                    onFocus={(e) => { e.target.style.borderColor = "#2563EB"; e.target.style.boxShadow = "0 0 0 3px rgba(37, 99, 235, 0.2)"; }}
+                    onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors" style={{ color: "#9CA3AF" }}>
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
-              style={{ background: "linear-gradient(135deg, #2F80ED, #7B61FF)", boxShadow: "0 4px 24px rgba(47,128,237,0.4)" }}
+              className="w-full flex items-center justify-center gap-2 text-white font-semibold transition-all duration-200 disabled:opacity-50"
+              style={{
+                height: 52,
+                borderRadius: 14,
+                background: "linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)",
+                boxShadow: "0px 8px 20px rgba(37, 99, 235, 0.35)",
+                fontSize: 16,
+              }}
+              onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.filter = "brightness(1.08)"; } }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.filter = "brightness(1)"; }}
             >
               {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
                   {mode === "login" && "Entrar"}
                   {mode === "signup" && "Criar conta"}
                   {mode === "forgot" && "Enviar link"}
-                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-gray-500 text-xs mt-8">
-          © {new Date().getFullYear()} RotaSmart. Todos os direitos reservados.
+        <p className="text-center text-xs mt-6" style={{ color: "#9CA3AF" }}>
+          © {new Date().getFullYear()} Rotasmart Motorista. Todos os direitos reservados.
         </p>
       </div>
     </div>
