@@ -33,7 +33,7 @@ const Profile = ({ onNavigate }: ProfileProps) => {
 
   const menuItems = [
     { icon: Crown, label: 'Assinatura', sub: 'Plano Premium · R$ 34,99/mês', color: 'text-amber-500', bg: 'bg-amber-50', screen: 'subscription' },
-    { icon: User, label: 'Dados Pessoais', sub: 'Nome, CPF e Telefone', color: 'text-blue-500', bg: 'bg-blue-50' },
+    { icon: User, label: 'Dados Pessoais', sub: 'Nome, CPF e Telefone', color: 'text-blue-500', bg: 'bg-blue-50', screen: 'personal-data' },
     { icon: Bell, label: 'Notificações', sub: 'Alertas e avisos', color: 'text-orange-500', bg: 'bg-orange-50' },
     { icon: Shield, label: 'Segurança', sub: 'Senha e biometria', color: 'text-green-500', bg: 'bg-green-50' },
     { icon: Settings, label: 'Preferências', sub: 'Mapa e navegação', color: 'text-purple-500', bg: 'bg-purple-50' },
