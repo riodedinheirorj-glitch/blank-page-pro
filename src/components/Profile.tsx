@@ -14,12 +14,23 @@ import {
   Map as MapIcon,
   Crown
 } from 'lucide-react';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileProps {
   onNavigate: (screen: string) => void;
 }
 
 const Profile = ({ onNavigate }: ProfileProps) => {
+  const { profile, loading } = useUserProfile();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/auth');
+  };
+
   const menuItems = [
     { icon: Crown, label: 'Assinatura', sub: 'Plano Premium · R$ 34,99/mês', color: 'text-amber-500', bg: 'bg-amber-50', screen: 'subscription' },
     { icon: User, label: 'Dados Pessoais', sub: 'Nome, CPF e Telefone', color: 'text-blue-500', bg: 'bg-blue-50' },
@@ -36,7 +47,7 @@ const Profile = ({ onNavigate }: ProfileProps) => {
         <div className="relative mb-4">
           <div className="w-24 h-24 rounded-[32px] bg-white shadow-card flex items-center justify-center border-4 border-white overflow-hidden">
             <img 
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Paulo" 
+              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.full_name || 'User'}`} 
               alt="Avatar" 
               className="w-full h-full object-cover"
             />
@@ -45,8 +56,8 @@ const Profile = ({ onNavigate }: ProfileProps) => {
             <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
           </div>
         </div>
-        <h2 className="text-xl font-bold text-gray-900">Paulo Silveira</h2>
-        <p className="text-sm text-gray-500 font-medium">Motorista Parceiro · Nível 4</p>
+        <h2 className="text-xl font-bold text-gray-900">{profile?.full_name || 'Motorista'}</h2>
+        <p className="text-sm text-gray-500 font-medium">{profile?.email || 'Motorista Parceiro'}</p>
         
         <div className="flex items-center gap-1 mt-2 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
           <Star size={14} className="text-yellow-400 fill-yellow-400" />
@@ -98,7 +109,10 @@ const Profile = ({ onNavigate }: ProfileProps) => {
       </div>
 
       {/* Logout Button */}
-      <button className="w-full bg-white rounded-2xl p-4 shadow-sm border border-red-50 flex items-center justify-center gap-2 text-red-500 font-bold text-sm active:scale-[0.98] transition-transform">
+      <button 
+        onClick={handleLogout}
+        className="w-full bg-white rounded-2xl p-4 shadow-sm border border-red-50 flex items-center justify-center gap-2 text-red-500 font-bold text-sm active:scale-[0.98] transition-transform"
+      >
         <LogOut size={18} />
         SAIR DA CONTA
       </button>
