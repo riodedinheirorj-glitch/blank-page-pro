@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { Bell, MapPin, Clock, TrendingUp, FileUp, History, Crown } from "lucide-react";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface DashboardProps {
   onNavigate: (screen: string) => void;
 }
 
 const Dashboard = ({ onNavigate }: DashboardProps) => {
+  const { firstName } = useUserProfile();
   const [greeting, setGreeting] = useState("Bom dia");
   const [currentDate, setCurrentDate] = useState("");
   const [location, setLocation] = useState("");
@@ -60,7 +62,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
       <div className="flex items-start justify-between pt-4 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground leading-tight">
-            {greeting}, Paulo 👋
+            {greeting}, {firstName} 👋
           </h1>
           <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
             <MapPin size={12} className="text-primary" />
