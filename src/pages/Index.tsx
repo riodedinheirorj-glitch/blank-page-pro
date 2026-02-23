@@ -7,6 +7,7 @@ import OptimizationLoading from "@/components/OptimizationLoading";
 import LocationAdjustment from "@/components/LocationAdjustment";
 import Profile from "@/components/Profile";
 import PersonalData from "@/components/PersonalData";
+import Security from "@/components/Security";
 import Subscription from "@/components/Subscription";
 import BottomNav from "@/components/BottomNav";
 import StatusBar from "@/components/StatusBar";
@@ -19,7 +20,7 @@ export type ImportedData = {
   fixedCeps: number;
 };
 
-type Screen = "dashboard" | "route" | "import" | "result" | "loading" | "adjustment" | "profile" | "personal-data" | "subscription";
+type Screen = "dashboard" | "route" | "import" | "result" | "loading" | "adjustment" | "profile" | "personal-data" | "security" | "subscription";
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("dashboard");
@@ -56,6 +57,8 @@ const Index = () => {
         return <Profile onNavigate={navigate} />;
       case "personal-data":
         return <PersonalData onNavigate={navigate} />;
+      case "security":
+        return <Security onNavigate={navigate} />;
       case "subscription":
         return <Subscription onNavigate={navigate} />;
       default:
