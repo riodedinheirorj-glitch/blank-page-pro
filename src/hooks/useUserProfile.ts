@@ -16,13 +16,24 @@ export const useUserProfile = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setLoading(false); return; }
 
-      const { data } = await supabase
+      // Try profiles table first
+      const { data, error } = await supabase
         .from("profiles")
         .select("id, full_name, email")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
-      setProfile(data);
+      if (data && !error) {
+        setProfile(data);
+      } else {
+        // Fallback to user metadata
+        const meta = user.user_metadata;
+        setProfile({
+          id: user.id,
+          full_name: meta?.full_name || meta?.name || null,
+          email: user.email || null,
+        });
+      }
       setLoading(false);
     };
 
